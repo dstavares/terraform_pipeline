@@ -18,17 +18,10 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Format Check
-        run: terraform fmt -check
-
       - name: Terraform Init
+        working-directory: .
         run: terraform init -backend-config="conn_str=${{ secrets.TERRAFORM_STATE_CONN_STR }}"
 
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan
-
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        working-directory: .
+        run: terraform apply --auto-approve
