@@ -1,0 +1,26 @@
+name: Terraform Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: .
+        run: terraform init -backend-config="conn_str=${{ secrets.TERRAFORM_STATE_CONN_STR }}"
+
+      - name: Terraform Apply
+        working-directory: .
+        env:
+          TF_VAR_digitalocean_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+        run: terraform apply -auto-approve
