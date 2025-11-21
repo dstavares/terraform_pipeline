@@ -1,0 +1,36 @@
+name: Terraform Destroy
+on:
+  workflow_dispatch:  # Permite execução manual
+    inputs:
+      environment:
+        description: 'Ambiente para destruir'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - staging
+        - production
+
+permissions:
+  contents: write
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_digitalocean_token: ${{ secrets.DIGITAL_OCEAN_TOKEN }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: .
+        run: terraform init -backend-config="conn_str=${{ secrets.TERRAFORM_STATE_CONN_STR }}"
+
+      - name: Terraform Destroy
+        working-directory: .
+        run: terraform destroy --auto-approve
